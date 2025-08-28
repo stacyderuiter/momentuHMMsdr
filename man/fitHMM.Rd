@@ -12,6 +12,7 @@ fitHMM(data, ...)
   data,
   nbStates,
   dist,
+  weights = rep(1, nrow(data)),
   Par0,
   beta0 = NULL,
   delta0 = NULL,
@@ -47,6 +48,7 @@ fitHMM(data, ...)
   data,
   hierStates,
   hierDist,
+  weights = rep(1, nrow(data)),
   Par0,
   hierBeta = NULL,
   hierDelta = NULL,
@@ -88,6 +90,8 @@ supported distributions are 'bern', 'beta', 'cat', exp', 'gamma', 'lnorm', 'logi
 \code{dist=list(step='gamma', angle='vm', dives='pois')} indicates 3 data streams ('step', 'angle', and 'dives')
 and their respective probability distributions ('gamma', 'vm', and 'pois').  The names of the data streams 
 (e.g., 'step', 'angle', 'dives') must match component names in \code{data}.}
+
+\item{weights}{a vector of numeric weights with length nrow(data)}
 
 \item{Par0}{A named list containing vectors of initial state-dependent probability distribution parameters for 
 each data stream specified in \code{dist}. The parameters should be in the order expected by the pdfs of \code{dist}, 

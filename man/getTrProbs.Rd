@@ -73,6 +73,8 @@ The first column pertains to the lower bound and the second column the upper bou
 \item{hierFormula}{A hierarchical formula structure for the transition probability covariates for each level of the hierarchy ('formula'). See \code{\link{fitHMM}}.}
 
 \item{hierDist}{A hierarchical data structure \code{\link[data.tree]{Node}} for the data streams ('dist'). See \code{\link{fitHMM}}.}
+
+\item{newdata}{New data for which to compute transition probabilities. Ignored if \code{data} is a data frame or a \code{\link{miSum}} object.}
 }
 \value{
 If \code{mixtures=1}, an array of dimension \code{nbStates} x \code{nbStates} x \code{nrow(data)} containing the t.p.m for each observation in \code{data}.

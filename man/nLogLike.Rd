@@ -12,6 +12,7 @@ nLogLike(
   parSize,
   data,
   dist,
+  weights = rep(1, nrow(data)),
   covs,
   estAngleMean,
   circularAngleMean,
@@ -57,6 +58,8 @@ distribution parameters for each data stream.}
 \item{data}{An object \code{momentuHMMData}.}
 
 \item{dist}{Named list indicating the probability distributions of the data streams.}
+
+\item{weights}{A vector of numeric weights, of length nrow(data)}
 
 \item{covs}{data frame containing the beta model covariates (if any)}
 

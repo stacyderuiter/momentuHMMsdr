@@ -102,6 +102,9 @@ get_mixProbs <- function(optPar,mod,mixture){
   dist <- mod$conditions$dist
   nbStates <- length(mod$stateNames)
   data <- mod$data
+  if(is.null(mod$weights)){
+    weights <- rep(1, nrow(data))
+    }else{weights <- mod$weights}
   mixtures <- mod$conditions$mixtures
   formula <- mod$conditions$formula
   knownStates <- mod$conditions$knownStates
@@ -224,7 +227,7 @@ get_mixProbs <- function(optPar,mod,mixture){
   for(mix in 1:mixtures){
     par$beta <- beta[(mix-1)*(nbCovs+1)+1:(nbCovs+1),,drop=FALSE]
     if(!mod$conditions$stationary) par$delta <- delta[mix,,drop=FALSE]
-    la[mix] <- nLogLike_rcpp(nbStates,as.matrix(covs),data,names(dist),dist,
+    la[mix] <- nLogLike_rcpp(nbStates,as.matrix(covs),data,names(dist),dist,weights,
                              par,
                              1,mod$conditions$zeroInflation,mod$conditions$oneInflation,mod$conditions$stationary,knownStates,mod$conditions$betaRef,1)
     if(!is.null(mod$prior)) la[mix] <- la[mix] - mod$prior(wpar)

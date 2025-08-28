@@ -310,8 +310,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // nLogLike_rcpp
-double nLogLike_rcpp(int nbStates, arma::mat covs, DataFrame data, CharacterVector dataNames, List dist, List Par, IntegerVector aInd, List zeroInflation, List oneInflation, bool stationary, IntegerVector knownStates, IntegerVector betaRef, int mixtures);
-RcppExport SEXP _momentuHMM_nLogLike_rcpp(SEXP nbStatesSEXP, SEXP covsSEXP, SEXP dataSEXP, SEXP dataNamesSEXP, SEXP distSEXP, SEXP ParSEXP, SEXP aIndSEXP, SEXP zeroInflationSEXP, SEXP oneInflationSEXP, SEXP stationarySEXP, SEXP knownStatesSEXP, SEXP betaRefSEXP, SEXP mixturesSEXP) {
+double nLogLike_rcpp(int nbStates, arma::mat covs, DataFrame data, CharacterVector dataNames, List dist, arma::colvec weights, List Par, IntegerVector aInd, List zeroInflation, List oneInflation, bool stationary, IntegerVector knownStates, IntegerVector betaRef, int mixtures);
+RcppExport SEXP _momentuHMM_nLogLike_rcpp(SEXP nbStatesSEXP, SEXP covsSEXP, SEXP dataSEXP, SEXP dataNamesSEXP, SEXP distSEXP, SEXP weightsSEXP, SEXP ParSEXP, SEXP aIndSEXP, SEXP zeroInflationSEXP, SEXP oneInflationSEXP, SEXP stationarySEXP, SEXP knownStatesSEXP, SEXP betaRefSEXP, SEXP mixturesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -320,6 +320,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< DataFrame >::type data(dataSEXP);
     Rcpp::traits::input_parameter< CharacterVector >::type dataNames(dataNamesSEXP);
     Rcpp::traits::input_parameter< List >::type dist(distSEXP);
+    Rcpp::traits::input_parameter< arma::colvec >::type weights(weightsSEXP);
     Rcpp::traits::input_parameter< List >::type Par(ParSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type aInd(aIndSEXP);
     Rcpp::traits::input_parameter< List >::type zeroInflation(zeroInflationSEXP);
@@ -328,7 +329,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< IntegerVector >::type knownStates(knownStatesSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type betaRef(betaRefSEXP);
     Rcpp::traits::input_parameter< int >::type mixtures(mixturesSEXP);
-    rcpp_result_gen = Rcpp::wrap(nLogLike_rcpp(nbStates, covs, data, dataNames, dist, Par, aInd, zeroInflation, oneInflation, stationary, knownStates, betaRef, mixtures));
+    rcpp_result_gen = Rcpp::wrap(nLogLike_rcpp(nbStates, covs, data, dataNames, dist, weights, Par, aInd, zeroInflation, oneInflation, stationary, knownStates, betaRef, mixtures));
     return rcpp_result_gen;
 END_RCPP
 }

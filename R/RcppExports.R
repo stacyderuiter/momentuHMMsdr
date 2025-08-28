@@ -261,6 +261,7 @@ getDM_rcpp <- function(X, covs, DM, nr, nc, cov, nbObs) {
 #' @param covs Covariates,
 #' @param data A \code{\link{momentuHMMData}} object of the observations,
 #' @param dataNames Character vector containing the names of the data streams,
+#' @param weights vector (length: nrow(data)) giving weights for every observation 
 #' @param dist Named list indicating the probability distributions of the data streams. 
 #' @param Par Named list containing the state-dependent parameters of the data streams, matrix of regression coefficients 
 #' for the transition probabilities ('beta'), and initial distribution ('delta').
@@ -277,8 +278,8 @@ getDM_rcpp <- function(X, covs, DM, nr, nc, cov, nbObs) {
 #' @param mixtures Number of mixtures for the state transition probabilities
 #' 
 #' @return Negative log-likelihood
-nLogLike_rcpp <- function(nbStates, covs, data, dataNames, dist, Par, aInd, zeroInflation, oneInflation, stationary, knownStates, betaRef, mixtures) {
-    .Call('_momentuHMM_nLogLike_rcpp', PACKAGE = 'momentuHMM', nbStates, covs, data, dataNames, dist, Par, aInd, zeroInflation, oneInflation, stationary, knownStates, betaRef, mixtures)
+nLogLike_rcpp <- function(nbStates, covs, data, dataNames, dist, weights, Par, aInd, zeroInflation, oneInflation, stationary, knownStates, betaRef, mixtures) {
+    .Call('_momentuHMM_nLogLike_rcpp', PACKAGE = 'momentuHMM', nbStates, covs, data, dataNames, dist, weights, Par, aInd, zeroInflation, oneInflation, stationary, knownStates, betaRef, mixtures)
 }
 
 #' Transition probability matrix

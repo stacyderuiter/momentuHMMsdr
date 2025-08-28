@@ -16,6 +16,7 @@ getTrProbs <- function(data, ...){
 
 #' @rdname getTrProbs
 #' @method getTrProbs default
+#' @param newdata New data for which to compute transition probabilities. Ignored if \code{data} is a data frame or a \code{\link{miSum}} object.
 #' @param nbStates Number of states. Ignored unless \code{data} is a data frame.
 #' @param beta Matrix of regression coefficients for the transition probabilities
 #' @param workBounds An optional named list of 2-column matrices specifying bounds on the working scale of the transition probability parameters ('beta' and, for recharge models, 'g0' and 'theta'). \code{workBounds$beta} must be a k x 2 matrix, where k=\code{length(beta)}.
@@ -110,7 +111,7 @@ getTrProbs.default <- function(data,nbStates,beta,workBounds=NULL,formula=~1,mix
     }
     
     if(!is.null(covIndex)) {
-      if(!is.numeric(covIndex) || any(covIndex<1 | covIndex>nrow(data$data))) stop("covIndex can only include integers between 1 and ",nrow(data))
+      if(!is.numeric(covIndex) || any(covIndex<1 | covIndex>nrow(data))) stop("covIndex can only include integers between 1 and ",nrow(data))
       data <- data[covIndex,,drop=FALSE]
     }
     
@@ -142,6 +143,7 @@ getTrProbs.default <- function(data,nbStates,beta,workBounds=NULL,formula=~1,mix
       }
       data$mod$Sigma <- Sigma
     } else if(is.null(data$mod$hessian) | inherits(data$mod$Sigma,"error")) getCI <- FALSE
+    
     
     if(!is.null(covIndex)) {
       if(!is.numeric(covIndex) || any(covIndex<1 | covIndex>nrow(data$data))) stop("covIndex can only include integers between 1 and ",nrow(data$data))
@@ -245,7 +247,8 @@ getTrProbs.hierarchical <- function(data,hierStates,hierBeta,workBounds=NULL,hie
     mixtures <- data$conditions$mixtures
     hierDist <- data$conditions$hierDist
     if(is.momentuHierHMM(data) && (is.null(data$mod$hessian) | inherits(data$mod$Sigma,"error"))) getCI <- FALSE
-    data <- data$data
+    data <- data$data      
+    
     if(!is.null(covIndex)) {
       data <- data[covIndex,,drop=FALSE]
     }

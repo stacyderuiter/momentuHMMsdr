@@ -9,6 +9,7 @@
 //' @param covs Covariates,
 //' @param data A \code{\link{momentuHMMData}} object of the observations,
 //' @param dataNames Character vector containing the names of the data streams,
+//' @param weights vector (length: nrow(data)) giving weights for every observation 
 //' @param dist Named list indicating the probability distributions of the data streams. 
 //' @param Par Named list containing the state-dependent parameters of the data streams, matrix of regression coefficients 
 //' for the transition probabilities ('beta'), and initial distribution ('delta').
@@ -26,7 +27,7 @@
 //' 
 //' @return Negative log-likelihood
 // [[Rcpp::export]]
-double nLogLike_rcpp(int nbStates, arma::mat covs, DataFrame data, CharacterVector dataNames, List dist,
+double nLogLike_rcpp(int nbStates, arma::mat covs, DataFrame data, CharacterVector dataNames, List dist, arma::colvec weights,
                      List Par,
                      IntegerVector aInd, List zeroInflation, List oneInflation,
                      bool stationary, IntegerVector knownStates, IntegerVector betaRef, int mixtures)
@@ -338,6 +339,12 @@ double nLogLike_rcpp(int nbStates, arma::mat covs, DataFrame data, CharacterVect
       } else {
         genProb.elem(noNAs) = funMap[genDist](genData[genData!=NAvalue],genArgs1.cols(noNAs),genArgs2.cols(noNAs));
       }
+      // cout << genProb(1);
+      // 
+      // // implement weighting
+      // for(unsigned int i=0 ; i<genProb.n_rows ; i++) {
+      //   genProb(i)*=weights(i); // multiply gen probs by obs weights
+      // }
       
       allProbs.col(state) = allProbs.col(state) % genProb;
       //for(int i=0; i<nbObs; i++){
@@ -370,6 +377,7 @@ double nLogLike_rcpp(int nbStates, arma::mat covs, DataFrame data, CharacterVect
       }
     }
   }
+  
 
   //======================//
   // 3. Forward algorithm //
@@ -391,11 +399,11 @@ double nLogLike_rcpp(int nbStates, arma::mat covs, DataFrame data, CharacterVect
       
     for(int mix=0; mix<mixtures; mix++){
       
-      if(nbStates>1)
+      if(nbStates>1){
         Gamma = trMat[mix].slice(i);
-      else
+      } else {
         Gamma = 1; // no transition if only one state
-      
+      }
       if(k<aInd.size() && i==(unsigned)(aInd(k)-1)) {
         // if 'i' is the 'k'-th element of 'aInd', switch to the next animal
         delt = delta[mix].row(k);
@@ -406,7 +414,7 @@ double nLogLike_rcpp(int nbStates, arma::mat covs, DataFrame data, CharacterVect
         alpha.row(mix) = (alpha.row(mix) * Gamma) % allProbs.row(i);
       }
       
-      mixlscale(mix) += log(sum(alpha.row(mix)));
+      mixlscale(mix) += (log(sum(alpha.row(mix))) * weights(i)) ;
       alpha.row(mix) = alpha.row(mix)/sum(alpha.row(mix));
     }
     if((k+1<aInd.size() && i==(unsigned)(aInd(k+1)-2)) || (i==(allProbs.n_rows-1))){

@@ -8,6 +8,7 @@
 #' distribution parameters for each data stream.
 #' @param parSize Named list indicating the number of natural parameters of the data stream probability distributions
 #' @param data An object \code{momentuHMMData}.
+#' @param weights A vector of numeric weights, of length nrow(data)
 #' @param dist Named list indicating the probability distributions of the data streams. 
 #' @param covs data frame containing the beta model covariates (if any)
 #' @param estAngleMean Named list indicating whether or not to estimate the angle mean for data streams with angular 
@@ -74,7 +75,7 @@
 #' }
 #'
 
-nLogLike <- function(optPar,nbStates,formula,bounds,parSize,data,dist,covs,
+nLogLike <- function(optPar,nbStates,formula,bounds,parSize,data,dist,weights=rep(1,nrow(data)),covs,
                      estAngleMean,circularAngleMean,consensus,zeroInflation,oneInflation,
                      stationary=FALSE,fullDM,DMind,Bndind,knownStates,fixPar,wparIndex,nc,meanind,covsDelta,workBounds,prior=NULL,betaCons=NULL,betaRef,deltaCons=NULL,optInd=NULL,recovs=NULL,g0covs=NULL,mixtures=1,covsPi,recharge=NULL,aInd)
 {
@@ -131,9 +132,10 @@ nLogLike <- function(optPar,nbStates,formula,bounds,parSize,data,dist,covs,
     par[distnames] <- lapply(par[distnames],as.matrix)
   }
 
-  nllk <- tryCatch(nLogLike_rcpp(nbStates,as.matrix(covs),data,names(dist),dist,
+  nllk <-  tryCatch(
+    nLogLike_rcpp(nbStates,as.matrix(covs),data,names(dist),dist,weights,
                         par,
-                        aInd,zeroInflation,oneInflation,stationary,knownStates,betaRef,mixtures),error=function(e) e)
+                        aInd,zeroInflation,oneInflation,stationary,knownStates,betaRef,mixtures), error = function(e) e)
 
   if(inherits(nllk,"error")) nllk <- NaN
   

@@ -10,6 +10,7 @@ nLogLike_rcpp(
   data,
   dataNames,
   dist,
+  weights,
   Par,
   aInd,
   zeroInflation,
@@ -30,6 +31,8 @@ nLogLike_rcpp(
 \item{dataNames}{Character vector containing the names of the data streams,}
 
 \item{dist}{Named list indicating the probability distributions of the data streams.}
+
+\item{weights}{vector (length: nrow(data)) giving weights for every observation}
 
 \item{Par}{Named list containing the state-dependent parameters of the data streams, matrix of regression coefficients 
 for the transition probabilities ('beta'), and initial distribution ('delta').}

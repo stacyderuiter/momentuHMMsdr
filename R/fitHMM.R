@@ -14,6 +14,7 @@ fitHMM <- function(data, ...) {
 #' @rdname fitHMM
 #' @method fitHMM momentuHMMData
 #' @param nbStates Number of states of the HMM.
+#' @param weights a vector of numeric weights with length nrow(data)
 #' @param dist A named list indicating the probability distributions of the data streams. Currently
 #' supported distributions are 'bern', 'beta', 'cat', exp', 'gamma', 'lnorm', 'logis', 'negbinom', 'norm', 'mvnorm2' (bivariate normal distribution), 'mvnorm3' (trivariate normal distribution),
 #' 'pois', 'rw_norm' (normal random walk), 'rw_mvnorm2' (bivariate normal random walk), 'rw_mvnorm3' (trivariate normal random walk), 'vm', 'vmConsensus', 'weibull', and 'wrpcauchy'. For example,
@@ -464,7 +465,7 @@ fitHMM <- function(data, ...) {
 #'
 #' @useDynLib momentuHMM
 
-fitHMM.momentuHMMData <- function(data,nbStates,dist,
+fitHMM.momentuHMMData <- function(data,nbStates,dist,weights=rep(1,nrow(data)),
                    Par0,beta0=NULL,delta0=NULL,
                    estAngleMean=NULL,circularAngleMean=NULL,
                    formula=~1,formulaDelta=NULL,stationary=FALSE,mixtures=1,formulaPi=NULL,
@@ -810,14 +811,14 @@ fitHMM.momentuHMMData <- function(data,nbStates,dist,
         if(!length(optPar)){
           curmod <- list()
           
-          curmod$minimum <- nLogLike(optPar,nbStates,newformula,p$bounds,p$parSize,data,inputs$dist,covs,
+          curmod$minimum <- nLogLike(optPar,nbStates,newformula,p$bounds,p$parSize,data,inputs$dist,weights=weights,covs,
                                     inputs$estAngleMean,inputs$circularAngleMean,inputs$consensus,zeroInflation,oneInflation,
                                     stationary,fullDM,DMind,p$Bndind,knownStates,unlist(fixParIndex$fixPar),fixParIndex$wparIndex,
                                     nc,meanind,covsDelta,workBounds,prior,betaCons,fixParIndex$betaRef,deltaCons,optInd,recovs,g0covs,mixtures,covsPi,hierRecharge,aInd)
           curmod$estimate <- numeric()
           
         } else if(optMethod=="nlm"){
-          withCallingHandlers(curmod <- tryCatch(nlm(nLogLike,optPar,nbStates,newformula,p$bounds,p$parSize,data,inputs$dist,covs,
+          withCallingHandlers(curmod <- tryCatch(nlm(nLogLike,optPar,nbStates,newformula,p$bounds,p$parSize,data,inputs$dist,weights,covs,
                                                inputs$estAngleMean,inputs$circularAngleMean,inputs$consensus,zeroInflation,oneInflation,
                                                stationary,fullDM,DMind,p$Bndind,knownStates,unlist(fixParIndex$fixPar),fixParIndex$wparIndex,
                                                nc,meanind,covsDelta,workBounds,prior,betaCons,fixParIndex$betaRef,deltaCons,optInd,recovs,g0covs,mixtures,covsPi,hierRecharge,aInd,
@@ -825,7 +826,7 @@ fitHMM.momentuHMMData <- function(data,nbStates,dist,
                                                stepmax=stepmax,steptol=steptol,
                                                iterlim=iterlim,hessian=ifelse(is.null(nlmPar$hessian),TRUE,nlmPar$hessian)),error=function(e) e),warning=h)
         } else {
-          withCallingHandlers(curmod <- tryCatch(optim(optPar,nLogLike,gr=NULL,nbStates,newformula,p$bounds,p$parSize,data,inputs$dist,covs,
+          withCallingHandlers(curmod <- tryCatch(optim(optPar,nLogLike,gr=NULL,nbStates,newformula,p$bounds,p$parSize,data,inputs$dist,weights,covs,
                                                      inputs$estAngleMean,inputs$circularAngleMean,inputs$consensus,zeroInflation,oneInflation,
                                                      stationary,fullDM,DMind,p$Bndind,knownStates,unlist(fixParIndex$fixPar),fixParIndex$wparIndex,
                                                      nc,meanind,covsDelta,workBounds,prior,betaCons,fixParIndex$betaRef,deltaCons,optInd,recovs,g0covs,mixtures,covsPi,hierRecharge,aInd,
@@ -887,7 +888,7 @@ fitHMM.momentuHMMData <- function(data,nbStates,dist,
   }
   else {
     mod <- list()
-    mod$minimum <- nLogLike(optPar,nbStates,newformula,p$bounds,p$parSize,data,inputs$dist,covs,
+    mod$minimum <- nLogLike(optPar,nbStates,newformula,p$bounds,p$parSize,data,inputs$dist,weights,covs,
                                inputs$estAngleMean,inputs$circularAngleMean,inputs$consensus,zeroInflation,oneInflation,
                                stationary,fullDM,DMind,p$Bndind,knownStates,unlist(fixParIndex$fixPar),fixParIndex$wparIndex,
                                nc,meanind,covsDelta,workBounds,prior,betaCons,fixParIndex$betaRef,deltaCons,optInd,recovs,g0covs,mixtures,covsPi,hierRecharge,aInd)
@@ -1031,7 +1032,7 @@ fitHMM.momentuHMMData <- function(data,nbStates,dist,
 #' @seealso \code{\link{simHierData}}
 #' 
 #' @export
-fitHMM.momentuHierHMMData <- function(data,hierStates,hierDist,
+fitHMM.momentuHierHMMData <- function(data,hierStates,hierDist,weights=rep(1, nrow(data)),
                        Par0,hierBeta=NULL,hierDelta=NULL,
                        estAngleMean=NULL,circularAngleMean=NULL,
                        hierFormula=NULL,hierFormulaDelta=NULL,mixtures=1,formulaPi=NULL,
@@ -1048,7 +1049,7 @@ fitHMM.momentuHierHMMData <- function(data,hierStates,hierDist,
   
   chkDots(...)
   
-  hfit <- fitHMM.momentuHMMData(momentuHMMData(data),inputHierHMM$nbStates,inputHierHMM$dist,Par0,inputHierHMM$beta,inputHierHMM$delta,
+  hfit <- fitHMM.momentuHMMData(momentuHMMData(data),inputHierHMM$nbStates,inputHierHMM$dist,weights = weights,Par0,inputHierHMM$beta,inputHierHMM$delta,
                 estAngleMean,circularAngleMean,
                 formula=inputHierHMM$formula,inputHierHMM$formulaDelta,stationary=FALSE,mixtures,formulaPi,
                 nlmPar,fit,
@@ -1087,6 +1088,8 @@ fitHMM.momentuHierHMMData <- function(data,hierStates,hierDist,
   hfit$conditions$hierFormula <- hierFormula
   hfit$conditions$hierFormulaDelta <- hierFormulaDelta
   class(hfit$data) <- class(data)
+  # store weights in fitted model object
+  hfit$weights <- weights
 
   hfit <- momentuHierHMM(hfit)
   
